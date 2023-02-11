@@ -1,6 +1,6 @@
 from src.parser.parser import Parse
 from src.data.db_action import create_record, check_exist, get_definitions
-from config import url, xpath, content
+from config import url, xpath, content, encoding
 import queue
 import threading
 
@@ -13,7 +13,7 @@ def load_data() -> list[str]:
     
     with open(
         'src/data/words.txt', 
-        encoding='utf-8',
+        encoding=encoding,
         ) as fl:
         words = fl.read().split()
         
@@ -26,7 +26,7 @@ def format_word(word: str) -> tuple[str, str]:
     
         if word[-1] == 'ь':
             l = word[-2]
-        return f, l
+        return f.lower(), l.lower()
     except:
         raise "Error: empty string"
 
@@ -46,6 +46,7 @@ def reformat_data(data: list) -> str:
 def prs(
     word: str, 
     definition: str, 
+    part_of_speech: str,
     first_letter: str, 
     last_letter: str,
     ) -> None:
@@ -53,9 +54,27 @@ def prs(
     create_record(
         word=word, 
         definition=definition, 
+        part_of_speech=part_of_speech,
         first_letter=first_letter, 
         last_letter=last_letter,
         )
+
+def remove_special_characters(string: str) -> str:
+    return ''.join(e for e in string if e.isalnum())
+
+def parse_part_of_speech(model) -> str:
+
+    wiki = model
+    wiki.xpath(
+        """
+        //*[@id="mw-content-text"]/div[1]/p[2]/a[1]/text() |
+        //*[@id="mw-content-text"]/div[1]/p[2]/text()
+        """)
+    part_of_speech = wiki.parse()
+
+    part_of_speech = part_of_speech[0].split()[0]
+
+    return remove_special_characters(part_of_speech).lower()
 
 def parse_wiki(
     words: list = load_data(),
@@ -67,40 +86,39 @@ def parse_wiki(
 
     for n, word in enumerate(words, start=1):
         print(f"""parse {n} word of {len(words)} -> {round(n/len(words)*100, 1)}% processed""")
-        if not check_exist(word=word):
 
-            f, l = format_word(word)
-            data = wiki.parse(word)
-            data = reformat_data(data)
-            
-            prs(
-                word=word, 
-                definition=data, 
-                first_letter=f, 
-                last_letter=l,
-                )
-        else:
-            print(f'The word - {word.upper()} is already in the base.')
+        parse_wiki_page(parser=wiki, word=word)
 
 def parse_wiki_page(
+    parser = None,
     word: str = '',
     ):
 
-    wiki = Parse(url)
-    wiki.xpath(xpath)
-    wiki.content(content)
+    word = word.lower()
+    wiki = parser
+    if parser is None:
+        wiki = Parse(url)
+        wiki.xpath(xpath)
+        wiki.content(content)
 
-    # for n, word in enumerate(words, start=1):
-        # print(f"""parse {n} word of {len(words)} -> {round(n/len(words)*100, 1)}% processed""")
     if not check_exist(word=word):
 
-        f, l = format_word(word)
-        data = wiki.parse(word)
-        data = reformat_data(data)
-            
+        try:
+            wiki.request(word)
+            data = wiki.parse()
+        except:
+            wiki.request(word.capitalize())
+            data = wiki.parse()
+        finally:
+            f, l = format_word(word)
+            data = reformat_data(data)
+            p_of_sp = parse_part_of_speech(wiki)
+        # print(data)
+
         prs(
             word=word, 
-            definition=data, 
+            definition=data,
+            part_of_speech=p_of_sp, 
             first_letter=f, 
             last_letter=l,
             )
@@ -115,7 +133,7 @@ def worker(url_queue) -> None:
         try:
             # Get your data off the queue, and do some work
             word = url_queue.get(False)
-            parse_wiki_page(word)
+            parse_wiki_page(word=word)
             # print(len(data))
 
         except queue.Empty:
@@ -138,5 +156,5 @@ def multiprocessing_parse(
 
 
 if __name__ == "__main__":
-    parse_wiki_page('жук')
+    parse_wiki(['жук'])
     # print(get_definitions(word="конвввь"))

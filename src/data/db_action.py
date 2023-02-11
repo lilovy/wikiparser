@@ -5,6 +5,7 @@ from src.data.word_models import Word
 def create_record(
     word: str, 
     definition: str, 
+    part_of_speech: str,
     first_letter: str, 
     last_letter: str, 
     table = Word, 
@@ -20,7 +21,8 @@ def create_record(
         session = Session()
         obj = table(
             word=word, 
-            definitions=definition, 
+            definitions=definition,
+            part_of_speech=part_of_speech, 
             first_letter=first_letter, 
             last_letter=last_letter,
             )

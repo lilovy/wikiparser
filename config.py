@@ -1,6 +1,9 @@
 url = 'https://ru.wiktionary.org/wiki/'
 
-xpath = """//*[@id="mw-content-text"]/div[1]/ol[1]/li"""
+xpath = (
+        """
+        //*[@id="mw-content-text"]/div[1]/ol[1]/li
+        """)
 
 content = (
         """
@@ -13,3 +16,5 @@ content = (
         //*[@id="mw-content-text"]/div[1]/ol[1]/li[{n}]/span/span/span/a/span/text()
         """
 )
+
+encoding = 'utf-8'

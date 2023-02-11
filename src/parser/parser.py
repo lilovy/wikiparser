@@ -11,7 +11,11 @@ from bs4 import BeautifulSoup
 
 
 class Parse:
-    def __init__(self, url: str) -> None:
+    def __init__(
+        self, 
+        url: str,
+        ) -> None:
+
         self._url = url
         self._page = ''        
         self._path = None
@@ -32,7 +36,7 @@ class Parse:
         self._dom = etree.HTML(str(self._soup))
 
     def __xpath(self) -> None:
-        self._values = self._dom.xpath(f"""{self._path}""")
+        self._values: list = self._dom.xpath(f"""{self._path}""")
 
     def _content(self) -> str:
         if isinstance(self._values[0], str):
@@ -55,12 +59,17 @@ class Parse:
                 self._result.append(self.__join(i))
         return self._result
 
-    def parse(self, page: str) -> list:
+    def request(self, page: str):
         """
-        return data from the page
+        make request from the page
         """
         self._set_page(page)
         self._parse()
+
+    def parse(self) -> list[str]:
+        """
+        return data from the page
+        """
         self.__xpath()
         return self.__represent()
 
@@ -70,6 +79,13 @@ class Parse:
     def content(self, path: str) -> None:
         if path:
             self._pathin = path
+
+    def storage(self) -> list:
+        data = []
+        for i in self._content():
+            data.append(i)
+
+        return data
 
 url = 'https://ru.wiktionary.org/wiki/'
 
@@ -81,18 +97,26 @@ pth ="""//*[@id="mw-content-text"]/div[1]/ol[1]/li[{n}]/text() |
         //*[@id="mw-content-text"]/div[1]/ol[1]/li[{n}]/span/text() |
         //*[@id="mw-content-text"]/div[1]/ol[1]/li[{n}]/span/span/text() |
         //*[@id="mw-content-text"]/div[1]/ol[1]/li[{n}]/span/span/span/text() |
-        //*[@id="mw-content-text"]/div[1]/ol[1]/li[{n}]/span/span/span/a/span/text()"""
+        //*[@id="mw-content-text"]/div[1]/ol[1]/li[{n}]/span/span/span/a/span/text()
+    """
 
 
 words = ['абзац', 'туземец']
 
 if __name__ == '__main__':
     wik = Parse(url)
-    wik.xpath(values)
-    wik.content(pth)
+    # wik.request()
+    # wik.xpath(values)
+    # wik.content(pth)
 
     for l in words:
+        wik.request(l)
+        wik.xpath(values)
+        wik.content(pth)
         print(l)
         print('')
 
-        print(wik.parse(f"{l}"))
+        print(wik.parse())
+        wik.xpath('//*[@id="mw-content-text"]/div[1]/p[2]/a[1]/text()')
+        print(wik.parse())
+        # print(wik.storage())
