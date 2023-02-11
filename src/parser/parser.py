@@ -10,20 +10,18 @@ from lxml import html, etree
 from bs4 import BeautifulSoup
 
 
-
-
 class Parse:
-    def __init__(self, url) -> None:
+    def __init__(self, url: str) -> None:
         self._url = url
         self._page = ''        
         self._path = None
         self._pathin = self._path
 
 
-    def _set_page(self, page):
+    def _set_page(self, page: str) -> None:
         self._page = self._url + page
 
-    def _parse(self):
+    def _parse(self) -> None:
         _xpath_headers = ({'User-Agent':
                           'Safari/537.36',\
                           'Accept-Language':
@@ -33,10 +31,10 @@ class Parse:
         self._soup = BeautifulSoup(self._resp.content, 'html.parser')
         self._dom = etree.HTML(str(self._soup))
 
-    def __xpath(self):
+    def __xpath(self) -> None:
         self._values = self._dom.xpath(f"""{self._path}""")
 
-    def _content(self):
+    def _content(self) -> str:
         if isinstance(self._values[0], str):
             yield self.__join(self._values)        
         else:
@@ -44,29 +42,32 @@ class Parse:
                 self._sense = i.xpath(f"""{self._pathin.format(n=n)}""")
                 yield self._sense
 
-    def __join(self, param):
+    def __join(self, param: str) -> str:
         __join = ''
         for i in param:
             __join += i.replace('\xa0', ' ')
         return __join
 
-    def __represent(self):
+    def __represent(self) -> list:
         self._result = []
         for i in self._content():
             if len(i) > 0:
                 self._result.append(self.__join(i))
         return self._result
 
-    def parse(self, page):
+    def parse(self, page: str) -> list:
+        """
+        return data from the page
+        """
         self._set_page(page)
         self._parse()
         self.__xpath()
         return self.__represent()
 
-    def xpath(self, path):
+    def xpath(self, path: str) -> None:
         self._path = path
 
-    def content(self, path):
+    def content(self, path: str) -> None:
         if path:
             self._pathin = path
 
