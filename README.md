@@ -1,2 +1,2 @@
-# oop_py_study
+# parser data from wikipedia.org
  
