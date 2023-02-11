@@ -12,7 +12,7 @@ content = content
 def load_data() -> list[str]:
     
     with open(
-        'src/data/words.txt', 
+        'src/data/nouns.txt', 
         encoding=encoding,
         ) as fl:
         words = fl.read().split()
@@ -109,10 +109,10 @@ def parse_wiki_page(
         except:
             wiki.request(word.capitalize())
             data = wiki.parse()
-        finally:
-            f, l = format_word(word)
-            data = reformat_data(data)
-            p_of_sp = parse_part_of_speech(wiki)
+        
+        f, l = format_word(word)
+        data = reformat_data(data)
+        p_of_sp = parse_part_of_speech(wiki)
         # print(data)
 
         prs(
@@ -157,4 +157,3 @@ def multiprocessing_parse(
 
 if __name__ == "__main__":
     parse_wiki(['жук'])
-    # print(get_definitions(word="конвввь"))
