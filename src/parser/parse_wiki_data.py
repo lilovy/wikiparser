@@ -1,5 +1,5 @@
 from src.parser.parser import Parse
-from src.data.db_action import create_record, check_exist
+from src.data.db_action import create_record, check_exist, get_definitions
 from config import url, xpath, content
 
 url = url
@@ -53,7 +53,7 @@ def prs(
         last_letter=last_letter,
         )
 
-def main(
+def parse_wiki(
     words: list = load_data(),
     ):
 
@@ -62,7 +62,7 @@ def main(
     wiki.content(content)
 
     for n, word in enumerate(words, start=1):
-        print(f'parse {n} word of {len(words)} -> {round(n/len(words)*100, 1)}% processed')
+        print(f"""parse {n} word of {len(words)} -> {round(n/len(words)*100, 1)}% processed""")
         if not check_exist(word=word):
 
             f, l = format_word(word)
@@ -76,10 +76,9 @@ def main(
                 last_letter=l,
                 )
         else:
-            print(f'The word - {word} is already in the base.')
+            print(f'The word - {word.upper()} is already in the base.')
 
 
 if __name__ == "__main__":
-    main()
-    # print(get_definitions(word="конь"))
-    # print(load_data())
+    parse_wiki()
+    print(get_definitions(word="конвввь"))

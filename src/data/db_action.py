@@ -48,14 +48,27 @@ def check_exist(
     except:
         raise 'Error'
 
-def get_definitions(table = Word, word: str = '') -> str:
-    session = Session()
-    data =  session.query(table).filter(
-        table.word == word,
-        ).first()
-    session.close()
-    return data
+def get_definitions(
+    table = Word, 
+    word: str = '',
+    ) -> str:
+    """
+    return information about the requested object
+    """
+    try:
+        session = Session()
+        data = session.query(table).filter(
+            table.word == word,
+            ).first()
+        session.close()
 
+        if data:
+            return data
+        else:
+            return 'object not found'
+
+    except:
+        raise "Error..."
 
 if __name__ == '_main__':
-    print(get_items(word='конь'))
+    print(get_definitions(word='конь'))
