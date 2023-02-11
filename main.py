@@ -1,15 +1,7 @@
-from src.parser.parse_wiki_data import parse_wiki, load_data
+from src.parser.parse_wiki_data import multiprocessing_parse
 
-from multiprocessing.dummy import Pool
-
-pool = Pool(3)
-
-data = load_data()
-
-result = pool.map(parse_wiki, data)
-pool.close()
-pool.join()
 
 if __name__ == '__main__':
+    # parse_wiki_page('жук')
+    multiprocessing_parse()
     # parse_wiki()
-    ...
