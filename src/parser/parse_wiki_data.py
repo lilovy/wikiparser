@@ -21,10 +21,11 @@ def load_data() -> list[str]:
 
 def format_word(word: str) -> tuple[str, str]:
 
+    word = remove_special_characters(word)
     try:
         f, l = word[0], word[-1]
     
-        if word[-1] == 'ь':
+        if word[-1] in ('ь'):
             l = word[-2]
         return f.lower(), l.lower()
     except:
@@ -32,15 +33,18 @@ def format_word(word: str) -> tuple[str, str]:
 
 def reformat_data(data: list) -> str:
 
-    data_output = []
+    if len(data) > 0:
+        data_output = []
 
-    for n, i in enumerate(data, start=1):
-        data_output.append(f'{n}. {i}\n\n')
+        for n, i in enumerate(data, start=1):
+            data_output.append(f'{n}. {i}\n\n')
 
-    data = """"""
-    for i in data_output:
-        data += i
-        
+        data = """"""
+        for i in data_output:
+            data += i
+    
+    else:
+        data = None
     return data
 
 def prs(
@@ -60,31 +64,46 @@ def prs(
         )
 
 def remove_special_characters(string: str) -> str:
-    return ''.join(e for e in string if e.isalnum())
+    # return ''.join(e  for e in string else e == '-' if e.isalnum())
+      # Create an empty string
+      result = ''
+      # Iterate over the characters of the string
+      for char in string:
+        # Only add non-special characters to the result string
+        if char.isalnum() or char == '-':
+          result += char
+      return result
+    
 
 def parse_part_of_speech(model) -> str:
 
     wiki = model
     wiki.xpath(
         """
-        //*[@id="mw-content-text"]/div[1]/p[2]/a[1]/text() |
-        //*[@id="mw-content-text"]/div[1]/p[2]/text()
+        //*[@id="mw-content-text"]/div[1]/p[2]/a[1]/text()
         """)
-    part_of_speech = wiki.parse()
 
-    part_of_speech = part_of_speech[0].split()[0]
+    try:
+        part_of_speech = wiki.parse()
 
-    return remove_special_characters(part_of_speech).lower()
+        part_of_speech = part_of_speech[0].split()[0]
+
+        return remove_special_characters(part_of_speech).lower()
+    except:
+        return None
 
 def parse_wiki(
     words: list = load_data(),
     ):
 
     wiki = Parse(url)
-    wiki.xpath(xpath)
-    wiki.content(content)
+    # wiki.xpath(xpath)
+    # wiki.content(content)
 
     for n, word in enumerate(words, start=1):
+        wiki.xpath(xpath)
+        wiki.content(content)
+        print(word)
         print(f"""parse {n} word of {len(words)} -> {round(n/len(words)*100, 1)}% processed""")
 
         parse_wiki_page(parser=wiki, word=word)
@@ -94,26 +113,29 @@ def parse_wiki_page(
     word: str = '',
     ):
 
-    word = word.lower()
     wiki = parser
-    if parser is None:
-        wiki = Parse(url)
-        wiki.xpath(xpath)
-        wiki.content(content)
 
     if not check_exist(word=word):
 
-        try:
-            wiki.request(word)
+        if parser is None:
+            wiki = Parse(url)
+            wiki.xpath(xpath)
+            wiki.content(content)
+
+        wiki.request(word)
+        data = wiki.parse()
+        if len(data) == 0:
+            if word.islower():
+                wiki.request(word.capitalize())
+            else:
+                wiki.request(word.lower())
             data = wiki.parse()
-        except:
-            wiki.request(word.capitalize())
-            data = wiki.parse()
-        
+
         f, l = format_word(word)
         data = reformat_data(data)
         p_of_sp = parse_part_of_speech(wiki)
         # print(data)
+        # print(p_of_sp)
 
         prs(
             word=word, 
@@ -140,11 +162,12 @@ def worker(url_queue) -> None:
             queue_full = False
 
 def multiprocessing_parse(
-    thread_count: int = 10
+    thread_count: int = 15, 
+    data: list = load_data(),
     ) -> None:
 
     q = queue.Queue()
-    data = load_data()
+    # data = load_data()
 
     for d in data:
         q.put(d)
@@ -157,3 +180,4 @@ def multiprocessing_parse(
 
 if __name__ == "__main__":
     parse_wiki(['жук'])
+   

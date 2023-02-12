@@ -7,8 +7,8 @@ class Word(Base):
 
     id = Column(Integer, primary_key=True)
     word = Column(String(50))
-    definitions = Column(Text())
-    part_of_speech = Column(String(25))
+    definitions = Column(Text(), default=None)
+    part_of_speech = Column(String(25), default=None)
     first_letter = Column(String(10))
     last_letter = Column(String(10))
 

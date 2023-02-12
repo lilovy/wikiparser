@@ -31,6 +31,12 @@ def create_record(
         session.commit()
         session.close()
     except:
+        with open(
+            'src/data/truble.txt',
+            'a+',
+            encoding='windows-1251',
+            ) as fl:
+            fl.write(f'{word}\n')
         raise 'Error: unsupported arguments'
         
 def check_exist(
@@ -48,7 +54,7 @@ def check_exist(
             table.word == word,
             ).first() is not None
     except:
-        raise 'Error'
+        return False
 
 def get_definitions(
     table = Word, 
@@ -72,5 +78,20 @@ def get_definitions(
     except:
         raise "Error..."
 
+def del_item(
+    word: str = '',
+    table = Word,
+    ) -> None:
+
+    try:
+        session = Session()
+        session.query(table).filter(
+            table.id == 1737,
+            ).delete()
+        session.commit()
+        session.close()
+    except:
+        raise "Error..."
+
 if __name__ == '_main__':
-    print(get_definitions(word='конь'))
+    print(del_item())

@@ -39,12 +39,15 @@ class Parse:
         self._values: list = self._dom.xpath(f"""{self._path}""")
 
     def _content(self) -> str:
-        if isinstance(self._values[0], str):
-            yield self.__join(self._values)        
-        else:
-            for n, i in enumerate(self._values, start=1):
-                self._sense = i.xpath(f"""{self._pathin.format(n=n)}""")
-                yield self._sense
+        try:
+            if isinstance(self._values[0], str):
+                yield self.__join(self._values)        
+            else:
+                for n, i in enumerate(self._values, start=1):
+                    self._sense = i.xpath(f"""{self._pathin.format(n=n)}""")
+                    yield self._sense
+        except:
+            return []
 
     def __join(self, param: str) -> str:
         __join = ''
@@ -105,9 +108,6 @@ words = ['абзац', 'туземец']
 
 if __name__ == '__main__':
     wik = Parse(url)
-    # wik.request()
-    # wik.xpath(values)
-    # wik.content(pth)
 
     for l in words:
         wik.request(l)
