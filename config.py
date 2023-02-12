@@ -14,4 +14,8 @@ content = (
         """
 )
 
-encoding = 'windows-1251'
+DB = 'defins.db'
+
+file = 'de.txt'
+
+encoding = 'utf-8'

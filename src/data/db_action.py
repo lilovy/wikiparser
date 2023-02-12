@@ -30,14 +30,14 @@ def create_record(
         session.add(obj)
         session.commit()
         session.close()
-    except:
+    except Exception as e:
         with open(
             'src/data/truble.txt',
             'a+',
-            encoding='windows-1251',
+            encoding='utf-8',
             ) as fl:
             fl.write(f'{word}\n')
-        raise 'Error: unsupported arguments'
+        raise e
         
 def check_exist(
     table = Word, 
@@ -94,4 +94,4 @@ def del_item(
         raise "Error..."
 
 if __name__ == '_main__':
-    print(del_item())
+    print('gf')

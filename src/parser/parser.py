@@ -68,6 +68,7 @@ class Parse:
         """
         self._set_page(page)
         self._parse()
+        print(self._resp, page)
 
     def parse(self) -> list[str]:
         """
