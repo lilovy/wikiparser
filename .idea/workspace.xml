@@ -2,19 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9f1d9c3e-6e27-494d-9697-79deef7a792a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/oop_py_study.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/oop_py_study.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/data/create_database.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data/create_database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/data/db_action.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data/db_action.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/data/nouns.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/data/nouns.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/data/truble.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/data/truble.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/data/word_definitions.db" beforeDir="false" afterPath="$PROJECT_DIR$/src/data/word_definitions.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data/defins.db" beforeDir="false" afterPath="$PROJECT_DIR$/src/data/defins.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/parser/parse_wiki_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/parser/parse_wiki_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/parser/parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/parser/parser.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,7 +69,7 @@
       <option name="presentableId" value="Default" />
       <updated>1676132668325</updated>
       <workItem from="1676132669673" duration="12000" />
-      <workItem from="1676239823970" duration="1028000" />
+      <workItem from="1676239823970" duration="2910000" />
     </task>
     <servers />
   </component>
@@ -98,6 +88,6 @@
     </option>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/wikiparser$main.coverage" NAME="main Coverage Results" MODIFIED="1676240124078" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/wikiparser$main.coverage" NAME="main Coverage Results" MODIFIED="1676242711047" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

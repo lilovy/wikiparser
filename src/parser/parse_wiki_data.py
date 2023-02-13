@@ -153,10 +153,14 @@ def parse_wiki_page(
         if len(data) == 0:
             if word.islower():
                 wiki.request(word.capitalize())
-                word = word.capitalize()
+                # word = word.capitalize()
             else:
                 wiki.request(word.lower())
-                word = word.lower()
+                # word = word.lower()
+            data = wiki.parse()
+            if len(data) == 0:
+                wiki.request(word.upper())
+
             data = wiki.parse()
 
         f, l = format_word(word)
@@ -210,7 +214,7 @@ def multiprocessing_parse(
 #         _ = [executor.submit(wi) for i in range(workers)]
 
 def mulit_process():
-    with multiprocessing.Pool(processes=500) as pool:
+    with multiprocessing.Pool(processes=30) as pool:
         pool.map(parse_wiki_page, load_data())
 
 if __name__ == "__main__":
