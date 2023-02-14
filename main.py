@@ -13,6 +13,6 @@ if __name__ == '__main__':
     # parse_wiki()
     # multiprocessing_parse()
     # del_item()
-    # parse_wiki_page(word='собака')
+    parse_wiki_page(word='собака')
     # app()
-    mulit_process()
+    # mulit_process()

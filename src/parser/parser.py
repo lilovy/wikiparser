@@ -8,30 +8,77 @@
 import requests
 from lxml import html, etree
 from bs4 import BeautifulSoup
+from random import choice
+from socket import gethostbyname, gethostname
+
 
 
 class Parse:
     def __init__(
         self, 
         url: str,
+        xpath: str = None,
+        content: str = None,
+        proxy: list = None,
         ) -> None:
 
         self._url = url
-        self._page = ''        
-        self._path = None
-        self._pathin = self._path
+        self._page = ''
+        self._path = xpath
+        self._pathin = content
+        self._proxies = proxy
 
 
     def _set_page(self, page: str) -> None:
         self._page = self._url + page
 
-    def _parse(self) -> None:
-        _xpath_headers = ({'User-Agent':
-                          'Safari/537.36',\
-                          'Accept-Language':
-                          'en-US, en;q=0.5'})
+    def __response(self):
+        headers = (
+            {'User-Agent':'Safari/537.36',
+            'Accept-Language':'en-US, en;q=0.5'}
+            )
+        proxy = self._proxies
 
-        self._resp = requests.get(self._page, headers=_xpath_headers)
+        if proxy:
+            proxy = choice(proxy)
+        
+        proxies = {
+            'http': proxy,
+            'https': proxy,
+        }
+        print(proxies)
+        
+        try:
+            r = requests.get(
+                self._page, 
+                headers=headers,
+                proxies=proxies,
+                )
+
+            while r.status_code == requests.codes.too_many:
+                r = requests.get(
+                    self._page,
+                    headers=headers,
+                    proxies=proxies,
+                    timeout=20,
+                )
+
+            if r.status_code == requests.codes.ok:
+                return r
+            elif r.status_code == requests.codes.not_found:
+                raise Exception(r.status_code)
+            else:
+                return self.__response()
+
+        except Exception as e:
+            raise e
+
+
+    def _parse(self) -> None:
+
+
+        self._resp = self.__response()
+        
         self._soup = BeautifulSoup(self._resp.content, 'html.parser')
         self._dom = etree.HTML(str(self._soup))
 
@@ -81,8 +128,10 @@ class Parse:
         self._path = path
 
     def content(self, path: str) -> None:
-        if path:
-            self._pathin = path
+        self._pathin = path
+
+    def proxy(self, proxy: list) -> None:
+        self._proxies = proxy
 
     def storage(self) -> list:
         data = []

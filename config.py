@@ -14,7 +14,7 @@ content = (
         """
 )
 
-DB = 'defins.db'
+DB = 'words.db'
 
 file = 'de.txt'
 

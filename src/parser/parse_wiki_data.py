@@ -1,4 +1,5 @@
 from src.parser.parser import Parse
+from src.parser.proxy_parser import proxy_list
 from src.data.db_action import create_record, check_exist, get_definitions
 from config import url, xpath, content, encoding, file
 import queue
@@ -144,19 +145,21 @@ def parse_wiki_page(
     if not check_exist(word=word):
 
         if wiki is None:
-            wiki = Parse(url)
-            wiki.xpath(xpath)
-            wiki.content(content)
+            wiki = Parse(
+                url, 
+                xpath=xpath, 
+                content=content,
+                proxy=load_data(file='proxy.txt'),
+                )
 
         wiki.request(word)
         data = wiki.parse()
         if len(data) == 0:
             if word.islower():
                 wiki.request(word.capitalize())
-                # word = word.capitalize()
             else:
                 wiki.request(word.lower())
-                # word = word.lower()
+
             data = wiki.parse()
             if len(data) == 0:
                 wiki.request(word.upper())
@@ -166,14 +169,15 @@ def parse_wiki_page(
         f, l = format_word(word)
         data = reformat_data(data)
         p_of_sp = parse_part_of_speech(wiki)
+        print(data)
 
-        create_record(
-            word=word, 
-            definition=data,
-            part_of_speech=p_of_sp, 
-            first_letter=f, 
-            last_letter=l,
-            )
+        # create_record(
+        #     word=word, 
+        #     definition=data,
+        #     part_of_speech=p_of_sp, 
+        #     first_letter=f, 
+        #     last_letter=l,
+        #     )
         # write_complete_data(word)
     else:
         # write_complete_data(word)
@@ -214,7 +218,7 @@ def multiprocessing_parse(
 #         _ = [executor.submit(wi) for i in range(workers)]
 
 def mulit_process():
-    with multiprocessing.Pool(processes=30) as pool:
+    with multiprocessing.Pool(processes=100) as pool:
         pool.map(parse_wiki_page, load_data())
 
 if __name__ == "__main__":
