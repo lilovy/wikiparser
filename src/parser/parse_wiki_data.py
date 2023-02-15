@@ -1,7 +1,18 @@
 from src.parser.parser import Parse
 from src.parser.proxy_parser import proxy_list
-from src.data.db_action import create_record, check_exist, get_definitions
-from config import url, xpath, content, encoding, file
+from src.data.db_action import (
+    create_record, 
+    check_exist, 
+    get_definitions,
+    get_words,
+    )
+from config import (
+    url, 
+    xpath, 
+    content, 
+    encoding, 
+    file,
+    )
 import queue
 import threading
 import multiprocessing
@@ -35,6 +46,28 @@ def write_complete_data(
         encoding=encoding,
         ) as fl:
         fl.write(f'{word}\n')
+
+def check_word() -> None:
+    data = load_data(file='complete.txt')
+    words = load_data(file='balance.txt')
+    for i in words:
+        if i not in data:
+            write_complete_data(i, 'wd.txt')
+    # if not check_exist(word=data):
+    #     write_complete_data(i, 'balance.txt')
+
+def set_data():
+
+    print(len(load_data()))
+    print(len(set(load_data())))
+
+def load_words():
+    words = []
+    for i in get_words():
+        if i[0] not in words:
+            write_complete_data(i[0], 'complete.txt')
+            words.append(i[0])
+    return words
 
 def complete_data() -> list[str]:
 
@@ -73,23 +106,6 @@ def reformat_data(data: list) -> str:
 
     return data
 
-def prs(
-    word: str, 
-    definition: str, 
-    part_of_speech: str,
-    first_letter: str, 
-    last_letter: str,
-    ) -> None:
-
-    create_record(
-        word=word, 
-        definition=definition, 
-        part_of_speech=part_of_speech,
-        first_letter=first_letter, 
-        last_letter=last_letter,
-        )
-    
-
 def remove_special_characters(string: str) -> str:
     # return ''.join(e  for e in string else e == '-' if e.isalnum())
       # Create an empty string
@@ -101,7 +117,6 @@ def remove_special_characters(string: str) -> str:
           result += char
       return result
     
-
 def parse_part_of_speech(model) -> str:
 
     wiki = model
@@ -133,14 +148,13 @@ def parse_wiki(
         print(word)
         print(f"""parse {n} word of {len(words)} -> {round(n/len(words)*100, 1)}% processed""")
 
-        parse_wiki_page(parser=wiki, word=word)
+        parse_wiki_page(wiki=wiki, word=word)
 
 def parse_wiki_page(
     # parser = None,
     word: str = '',
+    wiki = None,
     ):
-
-    wiki = None
 
     if not check_exist(word=word):
 
@@ -149,11 +163,12 @@ def parse_wiki_page(
                 url, 
                 xpath=xpath, 
                 content=content,
-                proxy=load_data(file='proxy.txt'),
+                proxy=True,
                 )
 
         wiki.request(word)
         data = wiki.parse()
+
         if len(data) == 0:
             if word.islower():
                 wiki.request(word.capitalize())
@@ -169,16 +184,15 @@ def parse_wiki_page(
         f, l = format_word(word)
         data = reformat_data(data)
         p_of_sp = parse_part_of_speech(wiki)
-        print(data)
 
-        # create_record(
-        #     word=word, 
-        #     definition=data,
-        #     part_of_speech=p_of_sp, 
-        #     first_letter=f, 
-        #     last_letter=l,
-        #     )
-        # write_complete_data(word)
+        create_record(
+            word=word, 
+            definition=data,
+            part_of_speech=p_of_sp, 
+            first_letter=f, 
+            last_letter=l,
+            )
+        write_complete_data(word, 'complete.txt')
     else:
         # write_complete_data(word)
         print(f'The word - {word.upper()} is already in the base.')

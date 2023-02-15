@@ -1,3 +1,4 @@
+import sqlalchemy as db
 from src.data.create_database import Session
 from src.data.word_models import Word
 
@@ -12,31 +13,24 @@ def create_record(
     ) -> None:
     """
     Arguments:
-        word: str 
-        definitions: str
-        first_letter: str
-        last_letter: str
+        word: `str` 
+        definitions: `str`
+        first_letter: `str`
+        last_letter: `str`
     """
     try:
-        session = Session()
-        obj = table(
-            word=word, 
-            definitions=definition,
-            part_of_speech=part_of_speech, 
-            first_letter=first_letter, 
-            last_letter=last_letter,
-            )
+        with Session() as session:
+            obj = table(
+                word=word, 
+                definitions=definition,
+                part_of_speech=part_of_speech, 
+                first_letter=first_letter, 
+                last_letter=last_letter,
+                )
+            session.add(obj)
+            session.commit()
 
-        session.add(obj)
-        session.commit()
-        session.close()
     except Exception as e:
-        with open(
-            'src/data/truble.txt',
-            'a+',
-            encoding='utf-8',
-            ) as fl:
-            fl.write(f'{word}\n')
         raise e
         
 def check_exist(
@@ -49,10 +43,11 @@ def check_exist(
     else -> return False
     """
     try:
-        session = Session()
-        return session.query(table).filter(
-            table.word == word,
-            ).first() is not None
+        with Session() as session:
+            return session.query(table).filter(
+                table.word == word,
+                ).first() is not None
+                
     except:
         return False
 
@@ -64,19 +59,27 @@ def get_definitions(
     return information about the requested object
     """
     try:
-        session = Session()
-        data = session.query(table).filter(
-            table.word == word,
-            ).first()
-        session.close()
+        with Session() as session:
+            data = session.query(table).filter(
+                table.word == word,
+                ).first()
 
         if data:
             return data
         else:
             return 'object not found'
 
-    except:
-        raise "Error..."
+    except Exception as e:
+        raise e
+
+def get_words(
+    table = Word,
+    ) -> list[str]:
+    try:
+        with Session() as session:
+            return list(session.query(table.word))
+    except Exception as e:
+        raise e
 
 def del_item(
     word: str = '',
@@ -84,14 +87,10 @@ def del_item(
     ) -> None:
 
     try:
-        session = Session()
-        session.query(table).filter(
-            table.id == 1737,
-            ).delete()
-        session.commit()
-        session.close()
-    except:
-        raise "Error..."
-
-if __name__ == '_main__':
-    print('gf')
+        with Session() as session:
+            session.query(table).filter(
+                table.word == word,
+                ).delete()
+            session.commit()
+    except Exception as e:
+        raise e

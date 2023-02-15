@@ -1,15 +1,11 @@
 
-""" 
-
-   create by lilovy 
-
-"""
+__author__ = "Lilovy"
 
 import requests
 from lxml import html, etree
 from bs4 import BeautifulSoup
 from random import choice
-from socket import gethostbyname, gethostname
+from src.parser.proxy_parser import proxy_list
 
 
 
@@ -19,7 +15,7 @@ class Parse:
         url: str,
         xpath: str = None,
         content: str = None,
-        proxy: list = None,
+        proxy: bool = False,
         ) -> None:
 
         self._url = url
@@ -32,43 +28,49 @@ class Parse:
     def _set_page(self, page: str) -> None:
         self._page = self._url + page
 
+    def __proxy(self):
+
+        proxies = self._proxies
+        if proxies:
+            proxies = choice(proxies)
+            proxy = proxies[0]
+            protocol = 'http'
+            if proxies[1] == 'yes':
+                protocol = 'https'
+
+        proxy = {
+            protocol: proxy,
+        }
+        return proxy
+
     def __response(self):
         headers = (
             {'User-Agent':'Safari/537.36',
             'Accept-Language':'en-US, en;q=0.5'}
             )
-        proxy = self._proxies
-
-        if proxy:
-            proxy = choice(proxy)
-        
-        proxies = {
-            'http': proxy,
-            'https': proxy,
-        }
-        print(proxies)
         
         try:
             r = requests.get(
                 self._page, 
                 headers=headers,
-                proxies=proxies,
                 )
 
             while r.status_code == requests.codes.too_many:
-                r = requests.get(
-                    self._page,
-                    headers=headers,
-                    proxies=proxies,
-                    timeout=20,
-                )
+                print('wait...')
+                if self._proxies:
+                    r = requests.get(
+                        self._page,
+                        headers=headers,
+                        proxies=self.__proxy(),
+                    )
+                else:
+                    r = requests.get(
+                        self._page,
+                        headers=headers,
+                        timeout=50,
+                    )
 
-            if r.status_code == requests.codes.ok:
-                return r
-            elif r.status_code == requests.codes.not_found:
-                raise Exception(r.status_code)
-            else:
-                return self.__response()
+            return r
 
         except Exception as e:
             raise e

@@ -16,6 +16,17 @@ content = (
 
 DB = 'words.db'
 
-file = 'de.txt'
+file = 'words.txt'
 
 encoding = 'utf-8'
+
+
+# proxy config
+
+proxy_url = 'https://free-proxy-list.net/'
+
+ip = "//*[@id='list']/div/div[2]/div/table/tbody/tr[*]/td[1]/text()"
+
+port = "//*[@id='list']/div/div[2]/div/table/tbody/tr[*]/td[2]/text()"
+
+protocol = "//*[@id='list']/div/div[2]/div/table/tbody/tr[*]/td[7]/text()"

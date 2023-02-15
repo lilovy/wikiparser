@@ -1,20 +1,26 @@
 from lxml import html
 import requests
-from socket import gethostbyname, gethostname
-gethostbyname(gethostname())
+from config import (
+    proxy_url,
+    ip,
+    port,
+    protocol,
+    )
 
+def proxy_list(
+    url: str = proxy_url,
+    ip: str = ip,
+    port: str = port,
+    protocol: str = protocol,
+    ) -> list[tuple[str, str]]:
 
-def proxy_list():
-
-    link = "https://free-proxy-list.net/"
-    resp = requests.get(link)
+    resp = requests.get(url)
     tree = html.fromstring(resp.content)
 
-    elem = tree.xpath("""//*[@id='list']/div/div[2]/div/table/tbody/tr[*]/td[1]/text()""")
-    elem2 = tree.xpath("//*[@id='list']/div/div[2]/div/table/tbody/tr[*]/td[2]/text()")
-    elem3 = tree.xpath('//*[@id="list"]/div/div[2]/div/table/tbody/tr[*]/td[7]/text()')
+    ip = tree.xpath(ip)
+    port = tree.xpath(port)
+    protocol = tree.xpath(protocol)
 
-
-    proxy = [f'{i}:{elem2[n]}' for n, i in enumerate(elem)]
+    proxy = [(f'{i}:{port[n]}', protocol[n]) for n, i in enumerate(ip)]
     
     return proxy
