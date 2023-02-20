@@ -82,10 +82,12 @@ class Parse:
         self._resp = self.__response()
         
         self._soup = BeautifulSoup(self._resp.content, 'html.parser')
+        # self._tree = html.fromstring(self._resp.content)
         self._dom = etree.HTML(str(self._soup))
 
     def __xpath(self) -> None:
         self._values: list = self._dom.xpath(f"""{self._path}""")
+        # self._values: list = self._tree.xpath(f"""{self._path}""")
 
     def _content(self) -> str:
         try:
@@ -125,6 +127,10 @@ class Parse:
         """
         self.__xpath()
         return self.__represent()
+    
+    def return_html(self):
+        ...
+        return str(self._soup)
 
     def xpath(self, path: str) -> None:
         self._path = path

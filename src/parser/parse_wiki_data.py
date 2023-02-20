@@ -4,7 +4,7 @@ from src.data.db_action import (
     create_record, 
     check_exist, 
     get_definitions,
-    get_words,
+    get_elements,
     )
 from config import (
     url, 
@@ -63,7 +63,7 @@ def set_data():
 
 def load_words():
     words = []
-    for i in get_words():
+    for i in get_elements():
         if i[0] not in words:
             write_complete_data(i[0], 'complete.txt')
             words.append(i[0])
@@ -108,14 +108,14 @@ def reformat_data(data: list) -> str:
 
 def remove_special_characters(string: str) -> str:
     # return ''.join(e  for e in string else e == '-' if e.isalnum())
-      # Create an empty string
-      result = ''
-      # Iterate over the characters of the string
-      for char in string:
+    # Create an empty string
+    result = ''
+    # Iterate over the characters of the string
+    for char in string:
         # Only add non-special characters to the result string
         if char.isalnum() or char == '-':
-          result += char
-      return result
+            result += char
+    return result
     
 def parse_part_of_speech(model) -> str:
 
@@ -151,7 +151,6 @@ def parse_wiki(
         parse_wiki_page(wiki=wiki, word=word)
 
 def parse_wiki_page(
-    # parser = None,
     word: str = '',
     wiki = None,
     ):
@@ -197,6 +196,25 @@ def parse_wiki_page(
         # write_complete_data(word)
         print(f'The word - {word.upper()} is already in the base.')
 
+def check_cplt(word: str):
+    if word in load_data(file='complete.txt'):
+        return True
+    else:
+        return False
+
+def save_html(
+    word: str,
+    ) -> None:
+    
+    if not check_cplt(word=word):
+        wiki = Parse(url)
+        wiki.request(word)
+        with open(f"src/data/result/html/{word}.html", "w", encoding='utf-8') as file:
+            file.write(wiki.return_html())
+        write_complete_data(word, 'complete.txt')
+    else:
+        print(f'word {word} is already exists')
+
 def worker(url_queue) -> None:
 
     queue_full = True
@@ -227,14 +245,17 @@ def multiprocessing_parse(
         t = threading.Thread(target=worker, args = (q,))
         t.start()
 
-# def multi_qouter(workers=4):
+# def multi_quoter(workers=4):
 #     with ThreadPoolExecutor(max_workers=workers) as executor:
 #         _ = [executor.submit(wi) for i in range(workers)]
 
-def mulit_process():
-    with multiprocessing.Pool(processes=100) as pool:
-        pool.map(parse_wiki_page, load_data())
+def multi_process(
+    func,
+    data: list = load_data(),
+    processes: int = 100,
+    ):
+    with multiprocessing.Pool(processes=processes) as pool:
+        pool.map(func, data)
 
 if __name__ == "__main__":
     parse_wiki(['жук'])
-   

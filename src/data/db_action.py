@@ -72,12 +72,13 @@ def get_definitions(
     except Exception as e:
         raise e
 
-def get_words(
+def get_elements(
+    column = 'word',
     table = Word,
     ) -> list[str]:
     try:
         with Session() as session:
-            return list(session.query(table.word))
+            return list(session.query(eval(f'table.{column}')))
     except Exception as e:
         raise e
 
