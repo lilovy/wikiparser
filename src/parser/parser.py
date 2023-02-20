@@ -8,6 +8,84 @@ from random import choice
 from src.parser.proxy_parser import proxy_list
 
 
+class GetHTML:
+    def __init__(
+        self,
+        url: str,
+        page: str,
+        proxy: bool = False,
+        ) -> None:
+        self.__url = url
+        self._url = self.__url + page
+        self._proxies = proxy
+        self._response()
+
+    def __proxy(self):
+        
+        if self._proxies:
+            proxies = choice(proxy_list())
+            proxy = proxies[0]
+            protocol = 'http'
+            if proxies[1] == 'yes':
+                protocol = 'https'
+
+        proxy = {
+            protocol: proxy,
+        }
+        return proxy
+
+    def __request(self):
+        headers = (
+            {'User-Agent':'Safari/537.36',
+            'Accept-Language':'en-US, en;q=0.5'}
+            )
+        
+        try:
+            r = requests.get(
+                self._url, 
+                headers=headers,
+                )
+
+            while r.status_code == requests.codes.too_many:
+                print('wait...')
+                if self._proxies:
+                    r = requests.get(
+                        self._url,
+                        headers=headers,
+                        proxies=self.__proxy(),
+                    )
+                else:
+                    r = requests.get(
+                        self._url,
+                        headers=headers,
+                        timeout=50,
+                    )
+
+            return r
+
+        except Exception as e:
+            raise e
+
+    def __response(self) -> None:
+        
+        self._resp = self.__request()
+        self._soup = BeautifulSoup(self._resp.content, 'html.parser')
+
+    def _response(self):
+        self.__response()
+        if self._find_redirect('redirectText'):
+            self.__response()
+
+    def _find_redirect(self, tag: str):
+        tag = self._soup.find(class_=tag)
+        state = False
+        if tag:
+            self._url = self.__url + (tag.next_element.get('href') or '')
+            state = True
+        return state
+
+    def get_html(self):
+        return str(self._soup.prettify())
 
 class Parse:
     def __init__(
@@ -43,7 +121,7 @@ class Parse:
         }
         return proxy
 
-    def __response(self):
+    def __request(self):
         headers = (
             {'User-Agent':'Safari/537.36',
             'Accept-Language':'en-US, en;q=0.5'}
@@ -79,7 +157,7 @@ class Parse:
     def _parse(self) -> None:
 
 
-        self._resp = self.__response()
+        self._resp = self.__request()
         
         self._soup = BeautifulSoup(self._resp.content, 'html.parser')
         # self._tree = html.fromstring(self._resp.content)

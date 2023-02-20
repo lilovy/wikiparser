@@ -1,4 +1,4 @@
-from src.parser.parser import Parse
+from src.parser.parser import Parse, GetHTML
 from src.parser.proxy_parser import proxy_list
 from src.data.db_action import (
     create_record, 
@@ -25,13 +25,13 @@ content = content
 file = file
 
 
-def load_data(file: str = file) -> list[str]:
+def load_data(file: str = file, sep: str = '\n') -> list[str]:
     
     with open(
         f'src/data/{file}', 
         encoding=encoding,
         ) as fl:
-        words = fl.read().split()
+        words = fl.read().split(sep=sep)
         
     return words
 
@@ -49,17 +49,11 @@ def write_complete_data(
 
 def check_word() -> None:
     data = load_data(file='complete.txt')
-    words = load_data(file='balance.txt')
+    words = load_data(file='words.txt')
     for i in words:
         if i not in data:
+            print(i)
             write_complete_data(i, 'wd.txt')
-    # if not check_exist(word=data):
-    #     write_complete_data(i, 'balance.txt')
-
-def set_data():
-
-    print(len(load_data()))
-    print(len(set(load_data())))
 
 def load_words():
     words = []
@@ -68,14 +62,6 @@ def load_words():
             write_complete_data(i[0], 'complete.txt')
             words.append(i[0])
     return words
-
-def complete_data() -> list[str]:
-
-    a = load_data(file='complete.txt')
-    b = load_data()
-    data = [v for v in b if v not in set(a) & set(b)]
-
-    return data
 
 def format_word(word: str) -> tuple[str, str]:
 
@@ -207,10 +193,10 @@ def save_html(
     ) -> None:
     
     if not check_cplt(word=word):
-        wiki = Parse(url)
-        wiki.request(word)
+        print(f"parse... {word}")
+        wiki = GetHTML(url='https://ru.wiktionary.org', page='/wiki/'+word, proxy=True)
         with open(f"src/data/result/html/{word}.html", "w", encoding='utf-8') as file:
-            file.write(wiki.return_html())
+            file.write(wiki.get_html())
         write_complete_data(word, 'complete.txt')
     else:
         print(f'word {word} is already exists')
@@ -254,6 +240,7 @@ def multi_process(
     data: list = load_data(),
     processes: int = 100,
     ):
+    print('start parsing!')
     with multiprocessing.Pool(processes=processes) as pool:
         pool.map(func, data)
 
