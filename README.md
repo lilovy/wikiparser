@@ -1,2 +1,2 @@
-# parser data from wikipedia.org
+# parser data from wiktionary.org
  
